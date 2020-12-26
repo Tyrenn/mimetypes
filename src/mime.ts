@@ -73,6 +73,21 @@ export class Mime {
     let match : RegExpMatchArray | null = type.match(/^\s*([^;\s]*)/);
     return (match && match[1] && this.#extensions.has(match[1])) ? this.#extensions.get(match[1].toLowerCase()) : undefined;
   };
+
+  /**
+  * Return all extensions
+  */
+  getAllExtensions(): Array<string>{
+    return new Array<string>(...this.#types.keys());
+  }
+
+
+  /**
+  * Return all types
+  */
+  getAllTypes(): Array<string>{
+    return new Array<string>(...this.#extensions.keys());
+  }
 }
 
 export const mimelite = new Mime(standard);
