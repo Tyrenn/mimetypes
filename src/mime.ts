@@ -7,12 +7,10 @@ export interface MimeTypeMap{
   [index: string]: Array<string>; 
 }
 
-
 export class Mime {
-  #types: Map<string, string> = new Map<string, string>();
-  #extensions: Map<string, string> = new Map<string, string>();
+  readonly types: Map<string, string> = new Map<string, string>();
+  readonly extensions: Map<string, string> = new Map<string, string>();
   
-
   constructor(...typeMaps : Array<MimeTypeMap>) {
     for (var typeMap of typeMaps) {
       this.define(typeMap);
@@ -33,22 +31,22 @@ export class Mime {
           continue;
         }
 
-        if (!force && this.#types.has(ext)) {
+        if (!force && this.types.has(ext)) {
           throw new Error(
             'Attempt to change mapping for "' + ext +
-            '" extension from "' + this.#types.get(ext) + '" to "' + type +
+            '" extension from "' + this.types.get(ext) + '" to "' + type +
             '". Pass `force=true` to allow this, otherwise remove "' + ext +
             '" from the list of extensions for "' + type + '".'
           );
         }
 
-        this.#types.set(ext, type);
+        this.types.set(ext, type);
       }
 
       // Use first extension as default
-      if (force || !this.#extensions.has(type)) {
+      if (force || !this.extensions.has(type)) {
         let ext = extensions[0];
-        this.#extensions.set(type, (ext[0] != '*') ? ext : ext.substr(1));
+        this.extensions.set(type, (ext[0] != '*') ? ext : ext.substr(1));
       }
     }
   }
@@ -63,7 +61,7 @@ export class Mime {
     let hasPath = last.length < path.length;
     let hasDot = ext.length < last.length - 1;
 
-    return ((hasDot || !hasPath) && this.#types.has(ext)) ? this.#types.get(ext) : undefined;
+    return ((hasDot || !hasPath) && this.types.has(ext)) ? this.types.get(ext) : undefined;
   };
 
   /**
@@ -71,23 +69,8 @@ export class Mime {
   */
   getExtension(type: string): string | undefined {
     let match : RegExpMatchArray | null = type.match(/^\s*([^;\s]*)/);
-    return (match && match[1] && this.#extensions.has(match[1])) ? this.#extensions.get(match[1].toLowerCase()) : undefined;
+    return (match && match[1] && this.extensions.has(match[1])) ? this.extensions.get(match[1].toLowerCase()) : undefined;
   };
-
-  /**
-  * Return all extensions
-  */
-  getAllExtensions(): Array<string>{
-    return new Array<string>(...this.#types.keys());
-  }
-
-
-  /**
-  * Return all types
-  */
-  getAllTypes(): Array<string>{
-    return new Array<string>(...this.#extensions.keys());
-  }
 }
 
 export const mimelite = new Mime(standard);
